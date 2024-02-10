@@ -1,15 +1,13 @@
-# utl-identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
-identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
     %let pgm=utl-identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r;
 
     Identifying overlapping ranges and combining into one range sas python r
 
-    SOAPBOX ON
-     SAS is available on a local worstation
-    SOAPBOX OFF
+    SOLUTIONS
 
-       SOLUTIONS
-
+           0 sas best solution
+             Keintz, Mark
+             mkeintz@outlook.com
+             Made a slight change to handle the last observation
            1 r
            2 sas
            3 don't understand python loops
@@ -38,11 +36,11 @@ identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
     /* 2 ==START===               |                                                    |                                        */
     /*   2007-06-09 2007-07-07    |      want<-sqldf("                                 |     4      2007-09-05      2007-10-12  */
     /*   2007-06-24 2007-07-22    |        select                                      |                                        */
-    /*                            |           min(start) as min_start                  |     5      2007-10-19      2007-11-16  */
-    /*   2007-07-03 2007-07-31    |          ,max(end)   as max_end                    |                                        */
-    /*               ===END====   |        from                                        |     6      2007-11-17      2007-11-16  */
+    /*   2007-07-03 2007-07-31    |           min(start) as min_start                  |     5      2007-10-19      2007-11-16  */
+    /*               ===END====   |          ,max(end)   as max_end                    |                                        */
+    /*                            |        from                                        |     6      2007-11-17      2007-12-15  */
     /*                            |           dates                                    |                                        */
-    /* 3 ==START===               |        group                                       |     7      2008-06-18      2008-08-20  */
+    /* 3 ==START===               |        group                                       |     7      2008-06-18      2008-08-08  */
     /*   2007-08-04 2007-09-01    |           by grp                                   |                                        */
     /*   2007-08-07 2007-09-04    |        ");                                         |                                        */
     /*              ===END====    |                                                    |                                        */
@@ -64,8 +62,8 @@ identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
     /*   2008-06-18 2008-07-16    |     group                                          |                                        */
     /*   2008-06-28 2008-07-26    |       by grp                                       |                                        */
     /*   2008-07-11 2008-08-08    |                                                    |                                        */
-    /*   2008-07-23 2008-08-20    |                                                    |                                        */
     /*              ===END====    |                                                    |                                        */
+    /*                            |                                                    |                                        */
     /*                            |                                                    |                                        */
     /*                            |                                                    |                                        */
     /**************************************************************************************************************************/
@@ -150,6 +148,43 @@ identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
     /*  14    2008-07-11    2008-08-08                                                                                        */
     /*                                                                                                                        */
     /**************************************************************************************************************************/
+
+
+    /*___                    _               _
+     / _ \   ___  __ _ ___  | |__   ___  ___| |_
+    | | | | / __|/ _` / __| | `_ \ / _ \/ __| __|
+    | |_| | \__ \ (_| \__ \ | |_) |  __/\__ \ |_
+     \___/  |___/\__,_|___/ |_.__/ \___||___/\__|
+
+    */
+
+    data want (drop=_:);
+        merge sd1.dates
+              sd1.dates (
+                  firstobs=2
+                  keep=start
+                  rename=(start=_nxt_start))
+             end=dne;
+        if _first_start=. then _first_start=start;
+        _lagEnd=lag(end);
+        if dne and _lagEnd ge start
+            or (_nxt_start ge end);
+    run;
+
+    /**************************************************************************************************************************/
+    /*                                                                                                                        */
+    /*   START          END                                                                                                   */
+    /*                                                                                                                        */
+    /* 2006-07-19    2006-08-16                                                                                               */
+    /* 2007-07-03    2007-07-31                                                                                               */
+    /* 2007-08-07    2007-09-04                                                                                               */
+    /* 2007-09-14    2007-10-12                                                                                               */
+    /* 2007-10-19    2007-11-16                                                                                               */
+    /* 2007-11-17    2007-12-15                                                                                               */
+    /* 2008-07-11    2008-08-08                                                                                               */
+    /*                                                                                                                        */
+    /**************************************************************************************************************************/
+
 
     /*
     / |  _ __
@@ -305,3 +340,4 @@ identifying-overlapping-ranges-and-combining-into-one-range-sas-python-r
      \___|_| |_|\__,_|
 
     */
+
